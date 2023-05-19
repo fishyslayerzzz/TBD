@@ -1,0 +1,99 @@
+---------------------1-------------------
+DELETE FROM student_hobby
+WHERE student_id IN (SELECT id FROM student WHERE date_birth IS NULL);
+DELETE FROM student WHERE date_birth IS NULL;
+
+---------------------2-------------------
+UPDATE student
+SET date_birth = '01-01-1999'
+WHERE date_birth is NULL;
+
+---------------------3-------------------
+DELETE FROM student_hobby
+WHERE student_id IN (SELECT id FROM student WHERE n_z = '21');
+DELETE FROM student WHERE n_z = '21';
+
+---------------------4-------------------
+UPDATE hobby
+SET risk = risk - 0.3
+WHERE id IN (
+SELECT hobby_id
+FROM student_hobby
+GROUP BY hobby_id
+ORDER BY COUNT(DISTINCT student_id) DESC
+LIMIT 1
+);
+
+---------------------5-------------------
+UPDATE student
+SET score = score + 0.01
+WHERE id IN (
+SELECT student_id FROM student_hobby WHERE finished_at IS NULL
+);
+
+---------------------6-------------------
+DELETE FROM student_hobby WHERE finished_at IS NOT NULL;
+DELETE FROM hobby
+WHERE id IN(SELECT hobby_id FROM student_hobby WHERE finished_at IS NOT NULL);
+
+---------------------7-------------------
+UPDATE student_hobby
+SET started_at = '11-15-2009', finished_at = null, hobby_id = 5
+WHERE student_id = 4;
+
+---------------------8-------------------
+DELETE FROM student_hobby sh1
+WHERE started_at =
+(SELECT MIN(started_at)
+FROM student_hobby sh2
+WHERE sh1.student_id = sh2.student_id
+AND sh1.hobby_id = sh2.hobby_id
+AND sh2.finished_at IS NOT NULL
+AND sh1.started_at > sh2.finished_at);
+
+
+---------------------9-------------------
+UPDATE hobby
+SET hobby_name =
+CASE hobby_name
+WHEN 'Футбол' THEN 'Бальные танцы'
+WHEN 'Баскетбол' THEN 'Вышивание крестиком'
+ELSE hobby_name
+END
+SELECT hobby
+
+---------------------10-------------------
+INSERT INTO hobby (id,hobby_name, risk) VALUES (7,'Учёба', '2');
+---------------------11-------------------
+UPDATE hobby
+SET hobby_name = 'Учеба'
+WHERE id IN (SELECT score from student WHERE score < 3.2);
+
+---------------------12-------------------
+
+UPDATE student
+SET n_group = substr(n_group::varchar,1,1) + 1::varchar
+WHERE substr(n_group::varchar,1,1) < 4::varchar;
+
+---------------------13-------------------
+DELETE FROM student_hobby
+WHERE student_id IN (SELECT id FROM student WHERE n_z = '2');
+DELETE FROM student WHERE n_z = '2';
+
+---------------------14-------------------
+UPDATE student
+SET score = 5.00
+WHERE id IN (
+SELECT student_id FROM student_hobby WHERE extract(year from age(finished_at, started_at)) > 10
+);
+
+---------------------15-------------------
+DELETE FROM student_hobby
+WHERE student_id IN ( SELECT id FROM student
+WHERE date_birth < (SELECT MIN(started_at) FROM student_hobby)
+);
+DELETE FROM hobby
+WHERE id NOT IN (
+SELECT hobby_id
+FROM student_hobby
+);
