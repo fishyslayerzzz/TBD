@@ -1,0 +1,27 @@
+-----------1-----------
+SELECT  name, surname,score, DENSE_RANK() OVER (ORDER BY score DESC) AS rank
+FROM student;
+
+SELECT  name, surname, score, RANK() OVER (ORDER BY score DESC) AS rank
+FROM (
+    SELECT name, surname, score, 
+           ROW_NUMBER() OVER (PARTITION BY score ORDER BY (SELECT NULL)) AS row_number
+    FROM student
+) AS subquery
+ORDER BY score DESC;
+-----------2-----------
+SELECT
+  request_at AS Day,
+  COUNT(CASE WHEN status LIKE 'cancelled%' THEN 1 END)::float / COUNT(*) AS "Cancellation Rate"
+FROM
+  trip
+  INNER JOIN users AS client ON trip.client_id = client.id
+  INNER JOIN users AS driver ON trip.driver_id = driver.id
+WHERE
+  client.banned = 'No'
+  AND driver.banned = 'No'
+  AND request_at BETWEEN '2013-10-01' AND '2013-10-03'
+GROUP BY
+  request_at
+ORDER BY
+  request_at;
